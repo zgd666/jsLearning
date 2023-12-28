@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IndexedDB Example</title>
+</head>
+<body>
+  <h1>欢迎来到数据存储页面</h1>
+  <button id="query" onclick="queryData()">点我进行查询</button>
+  <script>
+      document.addEventListener('DOMContentLoaded', function () {
+          // 打开或创建名为 "MyDatabase" 的数据库，版本号为 1
+          var request = indexedDB.open('MyDatabase', 1);
+
+          // 数据库打开/创建成功时触发
+          request.onsuccess = function (event) {
+              var db = event.target.result;
+              console.log('Database opened successfully');
+
+              // 在这里可以执行对数据库的操作，例如读取或写入数据
+              // 例如，插入数据
+              insertData(db);
+              queryData(db,'John Doe')
+          };
+
+          // 数据库打开/创建失败时触发
+          request.onerror = function (event) {
+              console.error('Error opening database', event.target.error);
+          };
+
+          // 首次创建数据库或数据库版本升级时触发
+          request.onupgradeneeded = function (event) {
+              var db = event.target.result;
+
+              // 创建一个名为 "MyObjectStore" 的对象存储空间，用于存储数据
+              var objectStore = db.createObjectStore('MyObjectStore', { keyPath: 'id', autoIncrement: true });
+
+              // 创建一个名为 "name" 的索引，用于按照名字检索数据
+              objectStore.createIndex('name', 'name', { unique: false });
+
+              console.log('Database upgrade/create needed');
+          };
+
+          function insertData(db) {
+              // 获取事务对象，指定读写权限
+              var transaction = db.transaction(['MyObjectStore'], 'readwrite');
+
+              // 获取对象存储空间
+              var objectStore = transaction.objectStore('MyObjectStore');
+
+              // 插入一条数据
+              var data = { name: 'John Doe', age: 30 };
+              var request = objectStore.add(data);
+
+              // 数据插入成功时触发
+              request.onsuccess = function (event) {
+                  console.log('Data inserted successfully');
+              };
+
+              // 数据插入失败时触发
+              request.onerror = function (event) {
+                  console.error('Error inserting data', event.target.error);
+              };
+          }
+          function queryData(db, nameToQuery) {
+              // 开启只读事务
+              var transaction = db.transaction(['MyObjectStore'], 'readonly');
+
+              // 获取对象存储空间
+              var objectStore = transaction.objectStore('MyObjectStore');
+
+              // 使用索引 "name" 进行查询
+              var index = objectStore.index('name');
+              var request = index.get(nameToQuery);
+
+              // 查询成功时触发
+              request.onsuccess = function (event) {
+                  var result = event.target.result;
+                  if (result) {
+                      console.log('Data found:', result);
+                  } else {
+                      console.log('Data not found');
+                  }
+              };
+
+              // 查询失败时触发
+              request.onerror = function (event) {
+                  console.error('Error querying data', event.target.error);
+              };
+          }
+      });
+
+  </script>
+</body>
+</html>
