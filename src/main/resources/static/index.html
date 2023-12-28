@@ -1,0 +1,26 @@
+<html lang="en">
+<meta charset="utf-8" />
+<body>
+<h1>hello word!!!</h1>
+<p>this is a html page</p>
+<button id="btn">click me</button>
+</body>
+<script>
+
+    document.getElementById('btn').onclick = () => {
+        const  f = fetch('http://localhost:8080/user')
+            .then(response => response.json())
+            .then(data => {
+                // 处理获取到的用户数据
+                console.log(data)
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        f.then((response) => {
+            console.log(`已收到响应：${response}`);
+        });
+        console.log("已发送请求……");
+    }
+</script>
+</html>
