@@ -4,6 +4,8 @@
 <h1>hello word!!!</h1>
 <p>this is a html page</p>
 <button id="btn">click me</button>
+
+<button id="btn2">click me too(链式使用Promise)</button>
 </body>
 <script>
 
@@ -21,6 +23,26 @@
             console.log(`已收到响应：${response}`);
         });
         console.log("已发送请求……");
+    }
+
+    document.getElementById('btn2').onclick = () => {
+        // 方式一，嵌套then
+        // const  fetchPromise  = fetch('http://localhost:8080/user')
+        // fetchPromise.then((response) => {
+        //     const jsonPromise = response.json();
+        //     jsonPromise.then((json) => {
+        //         console.log(json);
+        //     });
+        // });
+        //方式二。链式调用then
+        fetch('http://localhost:8080/user')
+            .then((response) => {
+            return response.json();
+            })
+            .then((json) => {
+                console.log(json);
+                console.log(typeof json)
+            })
     }
 </script>
 </html>
